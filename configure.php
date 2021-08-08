@@ -41,6 +41,7 @@ if(!CHTTPVars::IsEmpty("action"))
 			$TopY=   intval(CHTTPVars::GetValue("TopY"));
 			$CMX =   intval(CHTTPVars::GetValue("CMX"));
 			$CMY =   intval(CHTTPVars::GetValue("CMY"));
+			$ABChoices =   CHTTPVars::GetValue("CMZ");
 			$CPX =   intval(CHTTPVars::GetValue("CPX"));
 			$CPY =   intval(CHTTPVars::GetValue("CPY"));
 			$BotX =  intval(CHTTPVars::GetValue("BotX"));
@@ -93,7 +94,8 @@ if(!CHTTPVars::IsEmpty("action"))
 			
 			SetStep($ThisStep,$RallyeID);
 
-			redirect("name.php?RallyeID=$RallyeID");
+			redirect("name.php?ABChoices=3&RallyeID=$RallyeID");	// RallyeID=$RallyeID&ABChoices=$CMZ
+
 			break;
 
 			
@@ -119,11 +121,16 @@ if(count($arr))
 		<link rel="stylesheet" href="stylesheet.css">
 		
 		<SCRIPT LANGUAGE=JavaScript>
-		function ConfigDiv(sectionname, edivname, exname, eyname)
+/*		function ConfigDiv(sectionname, edivname, exname, eyname, ezname="")
 		{
 			ediv = document.getElementById(edivname);
 			eX = document.getElementById(exname);
 			eY = document.getElementById(eyname);
+			if (ezname == "") {
+			    eZ = 1
+			} else {
+				eZ = document.getElementById(ezname);
+			}
 			
 			ediv.innerHTML="";
 			
@@ -140,11 +147,54 @@ if(count($arr))
 				{
 					html += "<TR>";
 						for(j = 0; j < parseInt(eX.value); j++)
-						{
-							html += "<TD>";
-							html += "&nbsp;";
-							html += "</TD>";
-						}					
+							for(k = 0; k < parseInt(eZ.value); k++)
+							{
+								html += "<TD>";
+								html += "&nbsp;";
+								html += "</TD>";
+							}					
+					html += "</TR>"
+				}
+				html += "</TABLE>";
+				ediv.innerHTML = html;
+			}
+		}	
+*/
+		
+		function ConfigDiv(sectionname, edivname, exname, eyname, ezname="")
+		{
+			ediv = document.getElementById(edivname);
+			eX = document.getElementById(exname);
+			eY = document.getElementById(eyname);
+			if (ezname == "") {
+			    kmax = 1
+			} else {
+				kmax = parseInt(document.getElementById(ezname).value);
+			}
+			
+			ediv.innerHTML="";
+			
+			if(isNaN(parseInt(eX.value)) || isNaN(parseInt(eY.value)))
+			{
+				//alert(sectionname);
+				return;
+			}
+			else
+			{
+				html ="<B>"+sectionname+"</B><BR>";
+				html += "<TABLE WIDTH=100% BORDER=1>";
+				xmax = parseInt(eX.value);
+				ymax = parseInt(eY.value);
+				for(i = 0; i < ymax; i++)
+				{
+					html += "<TR>";
+						for(j = 0; j < xmax; j++)
+							for(k = 0; k < kmax; k++)
+							{
+								html += "<TD>";
+								html += "&nbsp;";
+								html += "</TD>";
+							}					
 					html += "</TR>"
 				}
 				html += "</TABLE>";
@@ -314,9 +364,10 @@ if(count($arr))
 		<TABLE WIDTH=100% border=0>
 			<TR>
 				<TD VALIGN=TOP>
-					<B>CM section:</B><BR>
-					&nbsp;&nbsp;Enter the number of Columns in your CM section: <INPUT SIZE=2 NAME=CMX ID=CMX VALUE="<?=$CMX?>" TYPE=TEXT OnKeyUp="ConfigDiv('CMs','cmdiv','CMX','CMY');"><BR>
-					&nbsp;&nbsp;Enter the number of Rows in your CM section: <INPUT SIZE=2 NAME=CMY ID=CMY VALUE="<?=$CMY?>" TYPE=TEXT OnKeyUp="ConfigDiv('CMs','cmdiv','CMX','CMY');"><BR>
+					<B>CM (or A/B RI) section:</B><BR>
+					&nbsp;&nbsp;Enter the number of Columns in your CM section: <INPUT SIZE=2 NAME=CMX ID=CMX VALUE="<?=$CMX?>" TYPE=TEXT OnKeyUp="ConfigDiv('CMs','cmdiv','CMX','CMY','CMZ');"><BR>
+					&nbsp;&nbsp;Enter the number of Rows in your CM section: <INPUT SIZE=2 NAME=CMY ID=CMY VALUE="<?=$CMY?>" TYPE=TEXT OnKeyUp="ConfigDiv('CMs','cmdiv','CMX','CMY','CMZ');"><BR>
+					&nbsp;&nbsp;For an A/B rallye, typical choices per RI: 3? <INPUT SIZE=1 NAME=CMZ ID=CMZ VALUE="<?=$CMZ?>" TYPE=TEXT OnKeyUp="ConfigDiv('CMs','cmdiv','CMX','CMY','CMZ');"><BR>
 				</TD>
 
 				<TD VALIGN=TOP>
@@ -379,7 +430,7 @@ if(count($arr))
 		
 		<SCRIPT LANGUAGE=JavaScript>
 			ConfigDiv('Header','topdiv','TopX','TopY');
-			ConfigDiv('CMs','cmdiv','CMX','CMY');
+			ConfigDiv('CMs','cmdiv','CMX','CMY','CMZ');
 			ConfigCPDiv();
 			ConfigDiv('Footer','botdiv','BotX','BotY');
 		</SCRIPT>

@@ -12,7 +12,7 @@
 		$arrSteps[4]  = "&nbsp;3.&nbsp;Values&nbsp;";
 		$arrSteps[8]  = "&nbsp;4.&nbsp;Combos&nbsp;";
 		$arrSteps[16] = "&nbsp;5.&nbsp;Config&nbsp;Done&nbsp;";
-		$arrSteps[48] = "&nbsp;6.&nbsp;Test&nbsp;Score&nbsp;";
+		$arrSteps[48] = "&nbsp;6.&nbsp;Test&nbsp; Score &nbsp;";
 		
 		$arrLinks[1]  = "configure.php?RallyeID=$RallyeID";
 		$arrLinks[2]  = "name.php?RallyeID=$RallyeID";
@@ -59,7 +59,7 @@
 						print("<$Weight>");
 							if($ShowLink)
 							{
-								print("<A HREF=".$arrLinks[$key].">");
+								print("<A HREF=\"".$arrLinks[$key]."\">");
 							}
 							print($val);
 							if($ShowLink)
@@ -75,7 +75,7 @@
 					print("&nbsp;&nbsp;&nbsp;&nbsp;");
 				print("</TD>");
 				print("<TD STYLE=\"border-bottom: 1px solid black; border-right: 1px solid black; background-image : url(tab.gif); background-repeat: no-repeat;\">");
-					print("<A HREF=export.php?RallyeID=$RallyeID>");
+					print("<A HREF=\"export.php?RallyeID=${RallyeID}\">");
 					print("&nbsp;Export&nbsp;Rallye&nbsp;");
 					print("</A>");
 				print("</TD>");

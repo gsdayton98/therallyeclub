@@ -1,7 +1,7 @@
 <?
 if(!defined('CONFIGURED')) 
 {
-	date_default_timezone_set("America/Los_Angeles");
+	//date_default_timezezone_set("America/Los_Angeles");
 	define('CONFIGURED',true);
 
 session_start();

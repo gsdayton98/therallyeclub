@@ -3,6 +3,7 @@ include "config.php";
 
 $ThisStep = 2;
 $RallyeID = CHTTPVars::GetValue("RallyeID");
+$ABChoices = $RallyeID = CHTTPVars::GetValue("ABChoices");
 if(!PasswordCheck($RallyeID,@$_SESSION["Password"])) redirect("index.php?RallyeID=$RallyeID");
 
 if(!IsSetStep(1,$RallyeID)) // have I completed the previous step?
@@ -19,6 +20,13 @@ $DefaultCM = array("A","N","AA","NN","B","O","BB","OO","C","P","CC","PP","D","Q"
 $DefaultCP = array("CP1","CP2","CP3","CP4","CP5","CP6","CP7","CP8","CP9","CP10","CP11","CP12","CP13");
 $DefaultBot = array("TB1","TB2","TB3","TB4","TB5","TB6","TB7","TB8","TB9","TB10");
 
+// Flatten 2D columns of RIs into Row Order for AB Rallyes
+for($i=1, $c=0; $c<$CMX; $c++) {
+	for($r=1; $r<=$CMY; $r++, $i++) {
+		$temp = ($c * $CMY) + $r;
+		$DefaultAB[$i] = "${temp}";
+	}
+}
 
 if(!CHTTPVars::IsEmpty("action"))
 {
@@ -99,9 +107,7 @@ foreach($arr as $data)
 				thediv = document.getElementById(section+"_"+x+"_"+y);
 				//alert(section+"_"+x+"_"+y+" is "+thediv);
 				thecount = document.getElementById("Count"+section+"_"+x+"_"+y);
-				
 				//alert(thecount.value);
-				
 				
 				// store the existing data in an array
 				for(i=1; i <= parseInt(thecount.value); i++)
@@ -132,11 +138,13 @@ foreach($arr as $data)
 				
 				// alter the innerHTML
 				thediv.innerHTML = "";
-				for(i=1; i <= parseInt(thecount.value); i++)
+				kmax = parseInt(thecount.value);
+				for(i=1; i <= kmax; i++)
 				{
 					//alert(i);
 					thediv.innerHTML += '<INPUT STYLE="font-family: courier; width: 100%;" NAME=Cells['+section+']['+x+']['+y+'][] ID='+section+'_'+x+'_'+y+'_'+i+' TYPE=TEXT><BR>';
-					thediv.innerHTML += '<INPUT NAME=Values['+section+']['+x+']['+y+'][] ID=v'+section+'_'+x+'_'+y+'_'+i+' TYPE=HIDDEN><BR>';
+					thediv.innerHTML += '<INPUT NAME=Values['+section+']['+x+']['+y+'][] ID=v'+section+'_'+x+'_'+y+'_'+i+' TYPE=HIDDEN>';
+					thediv.innerHTML += (i == kmax) ? '<BR>' : '';
 				}
 				// restore the existing data
 				j=store.length - 1;
@@ -185,7 +193,7 @@ foreach($arr as $data)
 		Enter the names of the elements for each cell. If you need to split a cell into more than one option
 		because of a CM numbering, AB Rallye or similar gimmick, click the '+' button in that cell. If you click too many,
 		just click the '-' button to remove the last split.<BR>
-		For your convenience the scoresheet has been prepopulated with the standard A-Z and AA-ZZ CMs. Your CPs have also be pre numbered.
+		For your convenience a CM scoresheet has been prepopulated with the standard A-Z and AA-ZZ CMs and an A/B scoresheet is prepopulated with RI numbers and horizontal A/B/C choices. Your CPs have also be pre numbered.
 		</fieldset>
 		<BR>
 		<BR>
@@ -223,7 +231,7 @@ foreach($arr as $data)
 												myprint("</DIV>");
 											myprint("</TD>");
 											myprint("<TD VALIGN=TOP ALIGN=RIGHT WIDTH=20>");
-												myprint("<INPUT STYLE=\"width=18px; font-size:11px;\" TYPE=BUTTON VALUE=\"+\" OnClick=\"Schizo('Top',$x,$y,'+');\"><BR>");
+												myprint("<INPUT STYLE=\"width=18px; font-size:11px;\" TYPE=BUTTON VALUE=\"+\" OnClick=\"Schizo('Top',$x,$y,'+')\"><BR>");
 												myprint("<INPUT STYLE=\"width=18px; font-size:11px;\" TYPE=BUTTON VALUE=\"-\" OnClick=\"Schizo('Top',$x,$y,'-');\">");
 											myprint("</TD>");
 										myprint("</TR>");
@@ -242,13 +250,14 @@ foreach($arr as $data)
 				<TD VALIGN=TOP>
 					<DIV ID=cmdiv>
 <?
-						myprint("<TABLE STYLE=\"border: 1px solid black;\" WIDTH=100%>");
-						$i=0;
+						myprint("<br>WDxyZ<br><TABLE STYLE=\"border: 1px solid black;\" WIDTH=100%>");
+						$i=1;
 						for($y = 0; $y < $CMY; $y++) // in HTML Rows come first
 						{
 							myprint("<TR>");
 							for($x = 0; $x < $CMX; $x++)
 							{
+								myprint($ABChoices);
 								myprint("<TD STYLE=\"border: 1px solid black;\" VALIGN=TOP>");
 									myprint("<TABLE BORDER=0 WIDTH=100%>");
 										myprint("<TR>");
@@ -256,15 +265,32 @@ foreach($arr as $data)
 												myprint("<INPUT TYPE=HIDDEN ID=CountCM_".$x."_".$y." VALUE=".(count($Cells['CM'][$x][$y])?count($Cells['CM'][$x][$y]):1).">");
 												myprint("<DIV ID=CM_".$x."_".$y.">");
 												if(count($Cells['CM'][$x][$y]) == 0 && !isset($Cells['CM'][$x][$y][0]))
-												{
-													$Cells['CM'][$x][$y][0] = @$DefaultCM[$i++];
-													$Values['CM'][$x][$y][0] = "";
-												}
-												for($j = 0; $j < count($Cells['CM'][$x][$y]); $j++)
-												{	
-													myprint("<INPUT STYLE=\"font-family: courier; width: 100%;\" NAME=Cells[CM][".$x."][".$y."][".$j."] ID=CM_".$x."_".$y."_".($j+1)." VALUE=\"".$Cells['CM'][$x][$y][$j]."\" TYPE=TEXT><BR>");
-													myprint("<INPUT NAME=Values[CM][".$x."][".$y."][".$j."] ID=vCM_".$x."_".$y."_".($j+1)." VALUE=\"".$Values['CM'][$x][$y][$j]."\" TYPE=HIDDEN><BR>");
-												}
+													if($ABChoices > 0 || $RallyeID == 169)
+													{	// Assuming an A/B type rallye
+														$Cells['CM'][$x][$y][0] = "Z"; // $DefaultAB[$i];	// RI number
+														$Cells['CM'][$x][$y][1] = "A";	// choice
+														$Cells['CM'][$x][$y][2] = "B";	// choice
+														$Cells['CM'][$x][$y][3] = "C";	// choice
+														myprint(".");
+
+														for($j = 0; $j < 4; $j++)
+														{	
+															$Values['CM'][$x][$y][$j] = "";
+															myprint("<INPUT STYLE=\"font-family: courier; width: 100%;\" NAME=Cells[CM][".$x."][".$y."][".$j."] ID=CM_".$x."_".$y."_".($j+1)." VALUE=\"".$Cells['CM'][$x][$y][$j]."\" TYPE=TEXT>");
+															myprint("<INPUT NAME=Values[CM][".$x."][".$y."][".$j."] ID=vCM_".$x."_".$y."_".($j+1)." VALUE=\"".$Values['CM'][$x][$y][$j]."\" TYPE=HIDDEN>");
+														}
+														myprint("<BR>");
+													}
+													else
+													{
+														$Cells['CM'][$x][$y][0] = @$DefaultAB[$i++];	// Should be CM
+														$Values['CM'][$x][$y][0] = "";
+														for($j = 0; $j < count($Cells['CM'][$x][$y]); $j++)
+														{	
+															myprint("<INPUT STYLE=\"font-family: courier; width: 100%;\" NAME=Cells[CM][".$x."][".$y."][".$j."] ID=CM_".$x."_".$y."_".($j+1)." VALUE=\"".$Cells['CM'][$x][$y][$j]."\" TYPE=TEXT><BR>");
+															myprint("<INPUT NAME=Values[CM][".$x."][".$y."][".$j."] ID=vCM_".$x."_".$y."_".($j+1)." VALUE=\"".$Values['CM'][$x][$y][$j]."\" TYPE=HIDDEN><BR>");
+														}	
+													}
 												myprint("</DIV>");
 											myprint("</TD>");
 											myprint("<TD VALIGN=TOP ALIGN=RIGHT WIDTH=20>");
