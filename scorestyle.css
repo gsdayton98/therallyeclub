@@ -1,0 +1,69 @@
+html, body {
+        color: #000000;
+        font-size: 11px;
+        font-family: sans-serif;
+        text-align: left;
+}
+
+
+a {
+	text-decoration: none;
+	color: #000000;
+        font-size: 11px;
+        font-family: sans-serif;
+        text-align: left;
+}
+
+
+a:hover {
+	text-decoration: none;
+	color: #0000FF;
+        font-size: 11px;
+        font-family: sans-serif;
+        text-align: left;
+}
+
+tr.tr0 {
+	background: white;
+}
+
+tr.tr1 {
+	background: silver;
+}
+
+td {
+        font-size: 11px;
+        color: #000000;
+        font-family: sans-serif;
+}
+
+input {
+        font-size: 11px;
+        color: #000000;
+        font-family: sans-serif;
+        text-align: center;
+}
+
+fieldset {
+	padding: 5px 5px 5px 5px;
+}
+
+select {
+        font-size: 11px;
+        color: #000000;
+        font-family: sans-serif;
+}
+
+select.havenothave {
+        font-size: 14px;
+        color: #000000;
+        font-family: Wingdings;
+}
+
+option.have {
+        color: #000000;
+}
+
+option.nothave {
+        color: #000000;
+}

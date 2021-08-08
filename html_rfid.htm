@@ -1,0 +1,95 @@
+<!--This example creates the object for PhidgetRFID and -->
+<!--updates a table when the Reader senses a tag.-->
+<!--The checkboxes are used to control outputs and enabled Antenna-->
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/2002/REC-xhtml1-20020801/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<title>PhidgetRFID for HTML/vbscript</title>
+
+<object classid="clsid:50484945-4745-5453-3000-000000000007" id="RFID1"></object>
+
+<script type="text/vbscript">
+
+
+RFID1.Open()
+RFID1.waitForAttachment(1000)
+
+If Not RFID1.IsAttached Then
+   msgbox "Not Attached - quitting"
+   Stop
+End If
+
+//Just to confirm that the library is installed and PhidgetInterfacekit is an object
+If Not IsObject(RFID1) Then
+   msgbox "quiting"
+   Stop
+End If
+
+//Routine for responding to the OnSensorChange event
+Sub OnBoardLED()
+    If document.getElementById("led").value = "unchecked" Then
+        RFID1.LEDOn = "True"
+        document.getElementById("led").value = "checked" 
+	    mytable.rows("rowLED").cells(1).innerText = "On"
+    Else
+        RFID1.LEDOn = False
+        document.getElementById("led").value = "unchecked"
+	    mytable.rows("rowLED").cells(1).innerText = "Off"         
+    End if
+End Sub
+
+//Routine for responding to the OnSensorChange event
+Sub AntennaEnabled()
+    If document.getElementById("antenna").value = "unchecked" Then
+        RFID1.AntennaOn = "True"
+        document.getElementById("antenna").value = "checked" 
+	    mytable.rows("rowAntenna").cells(1).innerText = "Enabled"
+    Else
+        RFID1.AntennaOn = "False"
+        document.getElementById("antenna").value = "unchecked" 
+        mytable.rows("rowAntenna").cells(1).innerText = "Disabled"
+    End if
+End Sub
+
+//When a check box is clicked the Output is changed
+Sub OutputState(ByVal Index)
+    If document.getElementById("output"+CStr(Index)).value = "unchecked" Then
+	    RFID1.OutputState(Index) = "True"
+	    document.getElementById("output"+CStr(Index)).value = "checked"
+        mytable.rows("rowOutput"+CStr(Index)).cells(1).innerText = "True"
+    Else
+	    RFID1.OutputState(Index) = "False"
+	    document.getElementById("output"+CStr(Index)).value = "unchecked"
+        mytable.rows("rowOutput"+CStr(Index)).cells(1).innerText = "False"
+    End if
+End sub
+
+Sub RFID1_OnTag(ByVal Tag)
+    mytable.rows("rowTag").cells(1).innerText = "Present"
+    mytable.rows("rowTag").cells(2).innerText = Tag    
+End Sub
+
+Sub RFID1_OnTagLost(ByVal Tag)
+    mytable.rows("rowTag").cells(1).innerText = "Lost"
+    mytable.rows("rowTag").cells(2).innerText = Tag    
+End Sub
+
+</script>
+</head>
+
+<body>
+<form action="html_rfid.htm">
+<table id="mytable">
+    <tr id="rowTag">    <td>Tag ID     </td><td>Nothing </td><td>Nothing</td></tr>
+    <tr id="rowLED">    <td>OnBoard LED</td><td>Off     </td><td><input type="checkbox" id="led"     name="led"     onclick="OnBoardLED()"     value="unchecked" /></td></tr>
+	<tr id="rowAntenna"><td>Antenna    </td><td>Disabled</td><td><input type="checkbox" id="antenna" name="antenna" onclick="AntennaEnabled()" value="unchecked" /></td></tr>
+	<tr id="rowOutput0"><td>Output0    </td><td>False   </td><td><input type="checkbox" id="output0" onclick="OutputState(0)" value="unchecked" /></td></tr>
+	<tr id="rowOutput1"><td>Output1    </td><td>False   </td><td><input type="checkbox" id="output1" onclick="OutputState(1)" value="unchecked" /></td></tr>
+</table>
+</form>	
+</body>
+</html>
+
+

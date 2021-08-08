@@ -1,0 +1,101 @@
+html, body {
+        color: #000000;
+        font-size: 32px;
+        font-family: Courier New, Courier;
+        text-align: left;
+}
+
+
+a {
+        font-size: 32px;
+	text-decoration: none;
+	color: #000000;
+        font-family: Courier New, Courier;
+        text-align: left;
+}
+
+.small {
+        font-size: 14px;
+}
+
+a:hover {
+        font-size: 32px;
+	text-decoration: none;
+	color: #0000FF;
+        font-family: Courier New, Courier;
+        text-align: left;
+}
+
+tr.tr0 {
+        font-size: 32px;
+	background: white;
+}
+
+tr.tr1 {
+        font-size: 32px;
+	background: silver;
+}
+
+td {
+        font-size: 32px;
+        color: #000000;
+        font-family: Courier New, Courier;
+}
+
+input {
+        font-size: 32px;
+        color: #000000;
+        font-family: Courier New, Courier;
+        text-align: left;
+}
+
+input.button {
+        font-size: 32px;
+        color: #000000;
+        font-family: Courier New, Courier;
+        text-align: center;
+}
+
+input.checkbox {
+        font-size: 32px;
+        color: #000000;
+        font-family: Courier New, Courier;
+        text-align: center;
+		width: 32px;
+		height: 32px;
+}
+
+input.text {
+        font-size: 32px;
+        color: #000000;
+        font-family: Courier New, Courier;
+        text-align: left;
+		border: 1px solid black;
+}
+
+
+fieldset {
+        font-size: 32px;
+	padding: 5px 5px 5px 5px;
+}
+
+select {
+        font-size: 32px;
+        color: #000000;
+        font-family: Courier New, Courier;
+}
+
+select.havenothave {
+        font-size: 32px;
+        color: #000000;
+        font-family: Wingdings;
+}
+
+option.have {
+        font-size: 32px;
+        color: #000000;
+}
+
+option.nothave {
+        color: #000000;
+}

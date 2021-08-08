@@ -1,0 +1,231 @@
+<?
+include "config.php";
+
+
+if(!@$sub)
+{
+	
+	$arrClasses[1] = "First Timer";
+	$arrClasses[2] = "Beginner";
+	$arrClasses[3] = "Novice";
+	$arrClasses[4] = "Senior";
+	$arrClasses[5] = "Expert";
+	$arrClasses[6] = "Master";
+	
+	
+	$RallyeID = CHTTPVars::GetValue("RallyeID"); // any one can look at the scoreboard, so there is no need for password here
+	
+	
+	if(!CHTTPVars::IsEmpty("action"))
+	{
+		$action = CHTTPVars::GetValue("action");
+		
+		switch(strtolower($action))
+		{
+			case "done":
+				redirect("score.php?RallyeID=$RallyeID");
+				break;
+				
+			default:
+				redirect("error.php");
+		}
+	}
+}
+
+$strSQL="SELECT CarNumber, CarClass, Driver, Navigator, Passenger, BaseScore, ProtestScore, DClub, NClub, PClub FROM ars_scoresheet WHERE RallyeID = $RallyeID ORDER By CarClass, CarNumber";
+$oDB->Query($strSQL);
+$arr = $oDB->GetRecordArray(false);
+$ScoreBoard = array();
+foreach($arr as $data)
+{
+	list($CarNumber, $CarClass, $DriverName, $NavigatorName, $PassengerName, $BaseScore, $ProtestScore, $DClub, $NClub, $PClub) = $data;
+	
+	$ScoreBoard[$CarClass][$CarNumber] = floatval($BaseScore) + floatval($ProtestScore);
+	$Driver[$CarNumber] = $DriverName.(trim($DClub) !=""?"($DClub)":"");
+	$Navigator[$CarNumber] = $NavigatorName.(trim($NClub) !=""?"($NClub)":"");;
+	$Protest[$CarNumber] = floatval($ProtestScore);
+}
+
+foreach($ScoreBoard as $CarClass => $data)
+{
+	arsort($ScoreBoard[$CarClass]);
+}
+
+if(!@$sub)
+{
+?>
+
+<HTML>
+	<HEAD>
+		<TITLE>ARS - Scoreboard</TITLE>
+		<link rel="stylesheet" href="stylesheet.css">
+<?
+if(!@$sub)
+{
+		//print("<meta http-equiv=refresh content=30>");
+}
+?>
+	</HEAD>
+	
+	<BODY>
+<?
+}
+?>
+		<DIV id=outerDiv style="width:800px; height:600px; overflow:hidden;">
+		<DIV id=innerDiv style="position:relative; left:0px; top:0px;">
+		<TABLE BORDER=1 WIDTH=100%>
+			<TR> <TD><br><br><br><br><br><br><br><br><br><br></TD> </TR>
+			<TR>
+<?
+				foreach($ScoreBoard as $CarClass => $data)
+				{
+					if($CarClass == 4)
+					{
+						print("</TR><TR>");
+					}
+?>
+				<TD VALIGN=TOP WIDTH=33%>
+					<TABLE BORDER=1 WIDTH=100%>
+						<TR>
+							<TD WIDTH=100% ALIGN=CENTER>
+								<FONT SIZE=+4>
+								<B><?=$arrClasses[intval($CarClass)]?></B>
+								</FONT>
+							</TD>
+						</TR>
+						
+<?
+						$Ord = 0;
+						$sorted = array();
+						foreach($ScoreBoard[$CarClass] as $CarNumber => $Score)
+						{
+							$sorted[] = array($CarNumber, floatval($Score)); // this looks pointless, but I need a way to peek ahead in the ordered array
+						}
+						
+						foreach($sorted as $i => $data)
+						{
+							list($CarNumber, $Score) = $data;
+?>
+							<TR>
+								<TD>
+									<TABLE WIDTH=100%>
+										<TR>
+											<TD WIDTH=33% style="text-align: left;">
+												<FONT SIZE=+2>
+												<B><?=Ordinal(++$Ord);?></B>
+												</FONT>
+											</TD>
+
+											<TD WIDTH=33% style="text-align: center;">
+												<FONT SIZE=+2>
+ 												<B><?=$arrClasses[intval($CarClass)]?></B>
+												</FONT>
+											</TD>
+
+											
+											<TD WIDTH=33% style="text-align: right;">
+												<FONT SIZE=+2>
+												<B><?=$CarNumber?></B>
+												</FONT>
+											</TD>
+										</TR>
+		
+										<TR>
+											<TD COLSPAN=3>
+												<FONT SIZE=+1>
+												<?=(trim(@$Driver[$CarNumber]) != "")?$Driver[$CarNumber]:"&nbsp;"?>
+												</FONT>
+											</TD>
+											
+										</TR>
+		
+										<TR>
+											<TD COLSPAN=2>
+												<FONT SIZE=+1>
+												<?=(trim(@$Navigator[$CarNumber]) != "")?$Navigator[$CarNumber]:"&nbsp;"?>
+												</FONT>
+											</TD>
+											
+										</TR>
+
+										<TR>
+											<TD COLSPAN=2 style="text-align: center;">
+<?
+	if($Protest[$CarNumber] != 0) print("<FONT COLOR=RED>");
+?>
+												<FONT SIZE=+4><B><?=intval($Score)?><? // the PHP begins here so that there is no space between the score and the aserisk
+
+												// if the intval of the next score in line is the same as mine and my floatval != my intval then mark me with an asterisk
+												if(isset($sorted[$i+1]) &&
+												   (floatval(intval($Score)) != floatval($Score)) &&
+												   (intval($Score) == intval($sorted[$i+1][1]))) // [$i+1][1] is the score of the next car in line
+												{
+													print("<SUP>*</SUP>");
+												}
+	if($Protest[$CarNumber] != 0) print("</FONT>");
+?>
+												</B></FONT>
+											</TD>
+											
+										</TR>
+									</TABLE>
+								</TD>
+							</TR>
+<?
+						}						
+?>					</TABLE>
+				</TD>
+<?
+				}
+?>
+			</TR>
+			<TR> <TD><br><br><br><br><br><br><br><br><br><br></TD> </TR>
+		</TABLE>
+
+<?
+if(!@$sub)
+{
+?>
+	</DIV>
+	</DIV>
+
+<SCRIPT>
+intScroll = setInterval("ShiftUp()",10);
+
+var direction=1;
+
+function ShiftUp()
+{
+	xoDiv = document.getElementById("outerDiv");
+	xiDiv = document.getElementById("innerDiv");
+
+	s = '';
+	ii = parseInt(xiDiv.style.top);
+	odivheight = parseInt(xoDiv.style.height);
+	idivtop = parseInt(xiDiv.style.top);
+	idivbot = xiDiv.offsetHeight + parseInt(xiDiv.style.top);
+
+	if(direction)
+	{
+		ii-=1;
+		if(idivbot <= odivheight)
+		{
+			direction = 0;
+		}
+	}
+	else
+	{
+		ii+=1;
+		if(idivtop >= 0)
+		{
+			direction = 1;
+		}
+	}
+	xiDiv.style.top=s+ii+'px';
+}
+</SCRIPT>
+	</BODY>
+</HTML>
+<?
+}
+?>
